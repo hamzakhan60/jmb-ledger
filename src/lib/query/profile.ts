@@ -6,6 +6,24 @@ import { toast } from "sonner";
 import type { Profile } from "@/types";
 import type { UpdateProfilePayload } from "@/lib/validators/profile";
 
+export interface SubscriptionInfo {
+  plan: "free" | "pro";
+  renewalDate: string | null;
+  status: string | null;
+}
+
+export function useSubscription() {
+  return useQuery({
+    queryKey: queryKeys.subscription,
+    queryFn: async () => {
+      const res = await fetch("/api/subscription");
+      if (!res.ok) throw new Error("Failed to fetch subscription");
+      return res.json() as Promise<SubscriptionInfo>;
+    },
+    staleTime: 1000 * 60 * 2,
+  });
+}
+
 export function useProfile() {
   return useQuery({
     queryKey: queryKeys.profile,

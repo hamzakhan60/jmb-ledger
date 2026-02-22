@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import Link from 'next/link';
 import { useProfile } from '@/lib/query/profile';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -48,6 +49,9 @@ export default function SettingsPage() {
         <TabsList>
           <TabsTrigger value="general">General</TabsTrigger>
           <TabsTrigger value="appearance">Appearance</TabsTrigger>
+          <TabsTrigger value="plan" asChild>
+            <Link href="/settings/plan">Plan & Billing</Link>
+          </TabsTrigger>
         </TabsList>
 
         <TabsContent value="general">

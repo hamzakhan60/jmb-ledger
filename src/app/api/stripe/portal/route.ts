@@ -25,10 +25,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
+    const origin = process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin;
+    let returnUrl = `${origin}/settings`;
+    try {
+      const body = await req.json().catch(() => ({}));
+      if (typeof body.return_url === "string" && body.return_url.startsWith("/")) {
+        returnUrl = `${origin}${body.return_url}`;
+      }
+    } catch {
+      // leave returnUrl as default
+    }
+
     const session = await getStripe().billingPortal.sessions.create({
       customer: profile.stripe_customer_id,
-      return_url:
-        `${process.env.NEXT_PUBLIC_APP_URL ?? req.nextUrl.origin}/settings`,
+      return_url: returnUrl,
     });
 
     return NextResponse.json({ url: session.url });

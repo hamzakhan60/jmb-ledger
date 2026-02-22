@@ -2,6 +2,7 @@ import type { InventoryFilters, SaleFilters } from "@/types";
 
 export const queryKeys = {
   profile: ["profile"] as const,
+  subscription: ["subscription"] as const,
 
   inventory: {
     all: ["inventory"] as const,
