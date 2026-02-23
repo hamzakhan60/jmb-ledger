@@ -44,19 +44,19 @@ export default function ProfilePage() {
 
   if (isLoading) {
     return (
-      <div className="p-6 max-w-2xl mx-auto space-y-6">
-        <Skeleton className="h-8 w-48" />
+      <div className="p-3 sm:p-4 md:p-6 max-w-2xl mx-auto space-y-4 sm:space-y-6">
+        <Skeleton className="h-7 sm:h-8 w-40 sm:w-48" />
         <div className="space-y-4">
-          <div className="flex items-center gap-4">
-            <Skeleton className="h-20 w-20 rounded-full shrink-0" />
+          <div className="flex items-center gap-3 sm:gap-4">
+            <Skeleton className="h-16 w-16 sm:h-20 sm:w-20 rounded-full shrink-0" />
             <div className="space-y-2 flex-1">
               <Skeleton className="h-4 w-32" />
-              <Skeleton className="h-3 w-48" />
+              <Skeleton className="h-3 w-40 sm:w-48" />
             </div>
           </div>
           <Skeleton className="h-4 w-full" />
           <Skeleton className="h-4 w-[75%]" />
-          <Skeleton className="h-10 w-24" />
+          <Skeleton className="h-9 w-24" />
         </div>
       </div>
     );
@@ -65,66 +65,70 @@ export default function ProfilePage() {
   const planLabel = profile?.role === "pro" || profile?.role === "dealer" ? "PRO" : "FREE";
 
   return (
-    <div className="p-6 max-w-2xl mx-auto space-y-6">
+    <div className="p-3 sm:p-4 md:p-6 max-w-2xl mx-auto space-y-4 sm:space-y-5 md:space-y-6">
       <motion.div
         initial={{ opacity: 0, y: -10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4 }}
       >
-        <h1 className="text-2xl font-bold">Profile</h1>
-        <p className="text-sm text-muted-foreground">Manage your account settings</p>
+        <h1 className="text-xl sm:text-2xl font-bold">Profile</h1>
+        <p className="text-xs sm:text-sm text-muted-foreground">Manage your account settings</p>
       </motion.div>
 
+      {/* ── Avatar + Email card ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.1 }}
       >
-        <Card className="p-6 border-border rounded-xl">
-          <div className="flex items-start gap-6">
-            <div className="flex flex-col items-center gap-3">
+        <Card className="p-4 sm:p-6 border-border rounded-xl">
+          {/* Stack vertically on mobile, row on sm+ */}
+          <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
+            <div className="flex flex-col items-center gap-2 sm:gap-3 shrink-0">
               <div
-                className="w-24 h-24 rounded-full flex items-center justify-center text-2xl"
+                className="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center"
                 style={{
                   backgroundColor: `${selectedColor}20`,
                   color: selectedColor,
                 }}
               >
-                <User className="w-12 h-12" />
+                <User className="w-8 h-8 sm:w-12 sm:h-12" />
               </div>
               <Badge
                 variant={planLabel === "PRO" ? "default" : "secondary"}
                 className={
                   planLabel === "PRO"
-                    ? "bg-primary/20 text-primary border-primary/30"
-                    : "bg-muted text-muted-foreground"
+                    ? "bg-primary/20 text-primary border-primary/30 text-xs"
+                    : "bg-muted text-muted-foreground text-xs"
                 }
               >
                 {planLabel}
               </Badge>
             </div>
-            <div className="flex-1 space-y-4">
-              <div className="space-y-2">
-                <Label htmlFor="email">Email</Label>
+
+            <div className="flex-1 w-full space-y-3 sm:space-y-4">
+              <div className="space-y-1.5 sm:space-y-2">
+                <Label htmlFor="email" className="text-xs sm:text-sm">Email</Label>
                 <Input
                   id="email"
                   type="email"
                   value={profile?.email ?? ""}
                   disabled
-                  className="bg-muted"
+                  className="bg-muted h-8 sm:h-9 text-xs sm:text-sm"
                 />
               </div>
             </div>
           </div>
-          <div className="mt-6 pt-6 border-t border-border">
-            <Label className="mb-3 block">Avatar Color</Label>
-            <div className="flex gap-2">
+
+          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
+            <Label className="mb-2 sm:mb-3 block text-xs sm:text-sm">Avatar Color</Label>
+            <div className="flex flex-wrap gap-2 sm:gap-2">
               {avatarColors.map((color) => (
                 <button
                   key={color}
                   type="button"
                   onClick={() => setSelectedColor(color)}
-                  className={`w-10 h-10 rounded-full transition-all ${
+                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all ${
                     selectedColor === color ? "ring-2 ring-offset-2 ring-primary" : ""
                   }`}
                   style={{ backgroundColor: color }}
@@ -135,30 +139,36 @@ export default function ProfilePage() {
         </Card>
       </motion.div>
 
+      {/* ── Security card ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.15 }}
       >
-        <Card className="p-6 border-border rounded-xl space-y-4">
-          <h3 className="font-medium">Security</h3>
-          <Button onClick={() => setChangePasswordOpen(true)} variant="outline">
+        <Card className="p-4 sm:p-6 border-border rounded-xl space-y-3 sm:space-y-4">
+          <h3 className="font-medium text-sm sm:text-base">Security</h3>
+          <Button
+            onClick={() => setChangePasswordOpen(true)}
+            variant="outline"
+            className="h-8 sm:h-9 text-xs sm:text-sm"
+          >
             Change Password
           </Button>
         </Card>
       </motion.div>
 
+      {/* ── Actions card ── */}
       <motion.div
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.4, delay: 0.2 }}
       >
-        <Card className="p-6 border-border rounded-xl space-y-4">
-          <h3 className="font-medium">Actions</h3>
-          <div className="space-y-3">
+        <Card className="p-4 sm:p-6 border-border rounded-xl space-y-3 sm:space-y-4">
+          <h3 className="font-medium text-sm sm:text-base">Actions</h3>
+          <div className="space-y-2 sm:space-y-3">
             <Button
               variant="outline"
-              className="w-full justify-start"
+              className="w-full justify-start h-8 sm:h-9 text-xs sm:text-sm"
               onClick={() => setLogoutConfirm(true)}
             >
               Log Out
@@ -167,34 +177,44 @@ export default function ProfilePage() {
         </Card>
       </motion.div>
 
+      {/* ── Change Password dialog ── */}
       <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
-        <DialogContent>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Change Password</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Change Password</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             Use the email link from Supabase to reset your password, or sign out and use &quot;Forgot password&quot; on the login page.
           </p>
-          <Button variant="outline" onClick={() => setChangePasswordOpen(false)}>
+          <Button
+            variant="outline"
+            className="h-8 sm:h-9 text-xs sm:text-sm"
+            onClick={() => setChangePasswordOpen(false)}
+          >
             Close
           </Button>
         </DialogContent>
       </Dialog>
 
+      {/* ── Logout confirm dialog ── */}
       <Dialog open={logoutConfirm} onOpenChange={setLogoutConfirm}>
-        <DialogContent>
+        <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md p-4 sm:p-6">
           <DialogHeader>
-            <DialogTitle>Log out of JMB Card Ledger?</DialogTitle>
+            <DialogTitle className="text-base sm:text-lg">Log out of JMB Card Ledger?</DialogTitle>
           </DialogHeader>
-          <p className="text-sm text-muted-foreground">
+          <p className="text-xs sm:text-sm text-muted-foreground">
             You will need to log in again to access your account.
           </p>
-          <div className="flex gap-3 pt-2">
-            <Button variant="ghost" onClick={() => setLogoutConfirm(false)}>
+          <div className="flex gap-2 sm:gap-3 pt-1 sm:pt-2">
+            <Button
+              variant="ghost"
+              className="h-8 sm:h-9 text-xs sm:text-sm"
+              onClick={() => setLogoutConfirm(false)}
+            >
               Cancel
             </Button>
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 h-8 sm:h-9 text-xs sm:text-sm"
               onClick={() => {
                 setLogoutConfirm(false);
                 handleSignOut();

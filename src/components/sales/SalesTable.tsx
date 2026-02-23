@@ -52,21 +52,21 @@ export function SalesTable({
   if (isLoading) {
     return (
       <Card className="border-border rounded-xl overflow-hidden">
-        <div className="p-4 space-y-4">
-          <div className="flex gap-4">
-            <Skeleton className="h-14 flex-1 rounded-lg" />
-            <Skeleton className="h-14 flex-1 rounded-lg" />
-            <Skeleton className="h-14 flex-1 rounded-lg" />
+        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
+          <div className="flex gap-2 sm:gap-4">
+            <Skeleton className="h-12 sm:h-14 flex-1 rounded-lg" />
+            <Skeleton className="h-12 sm:h-14 flex-1 rounded-lg" />
+            <Skeleton className="h-12 sm:h-14 flex-1 rounded-lg" />
           </div>
           <div className="space-y-2">
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               <Skeleton className="h-4 w-24" />
               <Skeleton className="h-4 w-20" />
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-20" />
             </div>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="flex gap-4 py-2">
+              <div key={i} className="flex gap-3 sm:gap-4 py-2">
                 <Skeleton className="h-4 flex-1 max-w-[200px]" />
                 <Skeleton className="h-4 w-16" />
                 <Skeleton className="h-4 w-20" />
@@ -82,25 +82,26 @@ export function SalesTable({
 
   return (
     <>
+      {/* ── Summary cards ── */}
       <motion.div
-        className="flex gap-4"
+        className="grid grid-cols-3 gap-2 sm:gap-4"
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.3, delay: 0.1 }}
       >
-        <Card className="px-4 py-3 border-border rounded-xl flex-1">
-          <p className="text-xs text-muted-foreground mb-1">Total Sales</p>
-          <p className="text-lg font-medium">{formatCurrency(totalGross)}</p>
+        <Card className="px-3 py-2 sm:px-4 sm:py-3 border-border rounded-xl">
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1 truncate">Total Sales</p>
+          <p className="text-sm sm:text-lg font-medium truncate">{formatCurrency(totalGross)}</p>
         </Card>
-        <Card className="px-4 py-3 border-border rounded-xl flex-1">
-          <p className="text-xs text-muted-foreground mb-1">Total Profit</p>
-          <p className={`text-lg font-medium ${totalProfit >= 0 ? "text-profit" : "text-loss"}`}>
+        <Card className="px-3 py-2 sm:px-4 sm:py-3 border-border rounded-xl">
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1 truncate">Total Profit</p>
+          <p className={`text-sm sm:text-lg font-medium truncate ${totalProfit >= 0 ? "text-profit" : "text-loss"}`}>
             {formatCurrency(totalProfit)}
           </p>
         </Card>
-        <Card className="px-4 py-3 border-border rounded-xl flex-1">
-          <p className="text-xs text-muted-foreground mb-1">Avg Margin</p>
-          <p className={`text-lg font-medium ${avgMargin >= 0 ? "text-profit" : "text-loss"}`}>
+        <Card className="px-3 py-2 sm:px-4 sm:py-3 border-border rounded-xl">
+          <p className="text-xs text-muted-foreground mb-0.5 sm:mb-1 truncate">Avg Margin</p>
+          <p className={`text-sm sm:text-lg font-medium truncate ${avgMargin >= 0 ? "text-profit" : "text-loss"}`}>
             {avgMargin.toFixed(1)}%
           </p>
         </Card>
@@ -112,7 +113,85 @@ export function SalesTable({
         transition={{ duration: 0.4, delay: 0.15 }}
       >
         <Card className="border-border rounded-xl overflow-hidden">
-          <div className="overflow-x-auto">
+
+          {/* ── Mobile: card list (< md) ── */}
+          <div className="md:hidden divide-y divide-border">
+            {sales.length === 0 ? (
+              <p className="p-8 text-center text-muted-foreground text-sm">
+                No sales yet. Record a sale to see it here.
+              </p>
+            ) : (
+              sales.map((sale, index) => (
+                <motion.div
+                  key={sale.id}
+                  className="p-3 sm:p-4 hover:bg-muted/50 transition-colors"
+                  initial={{ opacity: 0, x: -10 }}
+                  animate={{ opacity: 1, x: 0 }}
+                  transition={{ duration: 0.3, delay: 0.05 * index }}
+                >
+                  {/* Top row: color bar + name + actions */}
+                  <div className="flex items-start justify-between gap-2">
+                    <div className="flex items-start gap-2 min-w-0">
+                      <div
+                        className="w-1 h-10 rounded-full shrink-0 mt-0.5"
+                        style={{ backgroundColor: getGameColor(sale.game) }}
+                      />
+                      <div className="min-w-0">
+                        <p className="text-sm font-medium truncate">{sale.card_name}</p>
+                        <p className="text-xs text-muted-foreground truncate">
+                          {getGameDisplayName(sale.game)}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-0.5 shrink-0">
+                      {onFIFOAudit && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onFIFOAudit(sale.id)} aria-label="FIFO audit">
+                          <Info className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {onEdit && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7" onClick={() => onEdit(sale)} aria-label="Edit">
+                          <Pencil className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                      {onDelete && (
+                        <Button variant="ghost" size="icon" className="h-7 w-7 text-destructive" onClick={() => onDelete(sale)} aria-label="Delete">
+                          <Trash2 className="w-3.5 h-3.5" />
+                        </Button>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Meta row */}
+                  <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 pl-3">
+                    <Badge variant="outline" className="text-xs h-5">{sale.platform}</Badge>
+                    <span className="text-xs text-muted-foreground">{formatDate(sale.sale_date)}</span>
+                    <span className="text-xs text-muted-foreground">
+                      Qty: <span className="text-foreground">{sale.qty_sold}</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Gross: <span className="text-foreground font-mono">{formatCurrency(saleGross(sale))}</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Net: <span className="text-foreground font-mono">{formatCurrency(sale.net_proceeds)}</span>
+                    </span>
+                    <span className="text-xs text-muted-foreground">
+                      Profit:{" "}
+                      <span className={`font-mono ${sale.realized_profit >= 0 ? "text-profit" : "text-loss"}`}>
+                        {sale.realized_profit >= 0 ? "+" : ""}{formatCurrency(sale.realized_profit)}
+                      </span>
+                    </span>
+                    <span className={`text-xs ${saleMargin(sale) >= 0 ? "text-profit" : "text-loss"}`}>
+                      {saleMargin(sale).toFixed(1)}%
+                    </span>
+                  </div>
+                </motion.div>
+              ))
+            )}
+          </div>
+
+          {/* ── Desktop: full table (md+) ── */}
+          <div className="hidden md:block overflow-x-auto">
             <table className="w-full">
               <thead className="bg-muted/50 border-b border-border">
                 <tr>
@@ -158,9 +237,7 @@ export function SalesTable({
                         </div>
                       </td>
                       <td className="p-4">
-                        <Badge variant="outline" className="text-xs">
-                          {sale.platform}
-                        </Badge>
+                        <Badge variant="outline" className="text-xs">{sale.platform}</Badge>
                       </td>
                       <td className="p-4 text-sm">{formatDate(sale.sale_date)}</td>
                       <td className="p-4 text-sm">{sale.qty_sold}</td>
@@ -170,56 +247,30 @@ export function SalesTable({
                       </td>
                       <td className="p-4 text-sm font-mono">{formatCurrency(sale.net_proceeds)}</td>
                       <td className="p-4">
-                        <p
-                          className={`text-sm font-mono ${
-                            sale.realized_profit >= 0 ? "text-profit" : "text-loss"
-                          }`}
-                        >
+                        <p className={`text-sm font-mono ${sale.realized_profit >= 0 ? "text-profit" : "text-loss"}`}>
                           {sale.realized_profit >= 0 ? "+" : ""}
                           {formatCurrency(sale.realized_profit)}
                         </p>
                       </td>
                       <td className="p-4">
-                        <p
-                          className={`text-sm ${
-                            saleMargin(sale) >= 0 ? "text-profit" : "text-loss"
-                          }`}
-                        >
+                        <p className={`text-sm ${saleMargin(sale) >= 0 ? "text-profit" : "text-loss"}`}>
                           {saleMargin(sale).toFixed(1)}%
                         </p>
                       </td>
                       <td className="p-4">
                         <div className="flex items-center justify-end gap-2">
                           {onFIFOAudit && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => onFIFOAudit(sale.id)}
-                              aria-label="FIFO audit"
-                            >
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onFIFOAudit(sale.id)} aria-label="FIFO audit">
                               <Info className="w-4 h-4" />
                             </Button>
                           )}
                           {onEdit && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8"
-                              onClick={() => onEdit(sale)}
-                              aria-label="Edit"
-                            >
+                            <Button variant="ghost" size="icon" className="h-8 w-8" onClick={() => onEdit(sale)} aria-label="Edit">
                               <Pencil className="w-4 h-4" />
                             </Button>
                           )}
                           {onDelete && (
-                            <Button
-                              variant="ghost"
-                              size="icon"
-                              className="h-8 w-8 text-destructive"
-                              onClick={() => onDelete(sale)}
-                              aria-label="Delete"
-                            >
+                            <Button variant="ghost" size="icon" className="h-8 w-8 text-destructive" onClick={() => onDelete(sale)} aria-label="Delete">
                               <Trash2 className="w-4 h-4" />
                             </Button>
                           )}
@@ -231,15 +282,18 @@ export function SalesTable({
               </tbody>
             </table>
           </div>
+
+          {/* ── Pagination (shared) ── */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-              <p className="text-sm text-muted-foreground">
+            <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-t border-border">
+              <p className="text-xs sm:text-sm text-muted-foreground">
                 Page {page} of {totalPages}
               </p>
-              <div className="flex gap-2">
+              <div className="flex gap-1.5 sm:gap-2">
                 <Button
                   variant="outline"
                   size="sm"
+                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
                   disabled={page <= 1}
                   onClick={() => onPageChange?.(page - 1)}
                 >
@@ -248,6 +302,7 @@ export function SalesTable({
                 <Button
                   variant="outline"
                   size="sm"
+                  className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
                   disabled={page >= totalPages}
                   onClick={() => onPageChange?.(page + 1)}
                 >

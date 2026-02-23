@@ -20,7 +20,7 @@ export function LotDetailPanel({ lot }: LotDetailPanelProps) {
   if (!lot) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
+        <CardContent className="py-6 sm:py-8 text-center text-muted-foreground text-sm">
           Select a lot to view details
         </CardContent>
       </Card>
@@ -29,51 +29,40 @@ export function LotDetailPanel({ lot }: LotDetailPanelProps) {
 
   return (
     <Card>
-      <CardHeader>
-        <div className="flex items-center gap-2">
+      <CardHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 sm:pb-3">
+        <div className="flex items-start gap-2 flex-wrap">
           <Badge
             variant="outline"
-            className={cn("text-xs", gameColors[lot.game] ?? "")}
+            className={cn("text-xs shrink-0 mt-0.5", gameColors[lot.game] ?? "")}
           >
             {lot.game}
           </Badge>
-          <CardTitle className="text-lg">{lot.card_name}</CardTitle>
+          <CardTitle className="text-base sm:text-lg leading-snug">{lot.card_name}</CardTitle>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 text-sm">
-        <p>
-          <span className="text-muted-foreground">Set:</span> {lot.set_name}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Variant:</span>{" "}
-          {lot.variant || "—"}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Condition:</span>{" "}
-          {lot.condition}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Qty on hand:</span>{" "}
-          {lot.qty_on_hand} / {lot.qty_initial}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Cost per card:</span>{" "}
-          {formatCurrency(lot.cost_per_card)}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Total cost:</span>{" "}
-          {formatCurrency(lot.total_cost)}
-        </p>
-        <p>
-          <span className="text-muted-foreground">Purchase date:</span>{" "}
-          {formatDate(lot.purchase_date)}
-        </p>
-        {lot.vendor && (
-          <p>
-            <span className="text-muted-foreground">Vendor:</span> {lot.vendor}
-          </p>
-        )}
+
+      <CardContent className="px-4 pb-4 sm:px-6 sm:pb-5">
+        {/* Two-column grid on sm+, single column on mobile */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+          <DetailRow label="Set" value={lot.set_name} />
+          <DetailRow label="Variant" value={lot.variant || "—"} />
+          <DetailRow label="Condition" value={lot.condition} />
+          <DetailRow label="Qty on hand" value={`${lot.qty_on_hand} / ${lot.qty_initial}`} />
+          <DetailRow label="Cost per card" value={formatCurrency(lot.cost_per_card)} />
+          <DetailRow label="Total cost" value={formatCurrency(lot.total_cost)} />
+          <DetailRow label="Purchase date" value={formatDate(lot.purchase_date)} />
+          {lot.vendor && <DetailRow label="Vendor" value={lot.vendor} />}
+        </div>
       </CardContent>
     </Card>
+  );
+}
+
+function DetailRow({ label, value }: { label: string; value: string }) {
+  return (
+    <p className="text-xs sm:text-sm flex items-baseline gap-1 min-w-0">
+      <span className="text-muted-foreground shrink-0">{label}:</span>
+      <span className="truncate">{value}</span>
+    </p>
   );
 }

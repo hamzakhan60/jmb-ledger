@@ -33,16 +33,16 @@ export function InventoryTable({
   if (isLoading) {
     return (
       <Card className="border-border rounded-xl overflow-hidden">
-        <div className="p-4 space-y-4">
+        <div className="p-3 sm:p-4 space-y-3 sm:space-y-4">
           <div className="space-y-2">
-            <div className="flex gap-4">
+            <div className="flex gap-3 sm:gap-4">
               <Skeleton className="h-4 w-28" />
               <Skeleton className="h-4 w-20" />
               <Skeleton className="h-4 w-16" />
               <Skeleton className="h-4 w-20" />
             </div>
             {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
-              <div key={i} className="flex gap-4 py-2">
+              <div key={i} className="flex gap-3 sm:gap-4 py-2">
                 <Skeleton className="h-4 flex-1 max-w-[180px]" />
                 <Skeleton className="h-4 w-20" />
                 <Skeleton className="h-4 w-14" />
@@ -63,7 +63,7 @@ export function InventoryTable({
         animate={{ opacity: 1, scale: 1 }}
         transition={{ duration: 0.4 }}
       >
-        <Card className="border-border rounded-xl p-12 text-center">
+        <Card className="border-border rounded-xl p-8 sm:p-12 text-center">
           <p className="text-muted-foreground mb-2">No inventory yet</p>
           <p className="text-sm text-muted-foreground">
             Start by adding your first inventory lot to track your card investments.
@@ -80,7 +80,85 @@ export function InventoryTable({
       transition={{ duration: 0.4, delay: 0.1 }}
     >
       <Card className="border-border rounded-xl overflow-hidden">
-        <div className="overflow-x-auto">
+        {/* ── Mobile: card list (< md) ── */}
+        <div className="md:hidden divide-y divide-border">
+          {lots.map((lot, index) => (
+            <motion.div
+              key={lot.id}
+              className="p-3 sm:p-4 hover:bg-muted/50 transition-colors"
+              initial={{ opacity: 0, x: -20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.3, delay: 0.05 * index }}
+            >
+              <div className="flex items-start justify-between gap-2">
+                {/* Left: color bar + name */}
+                <div className="flex items-start gap-2 min-w-0">
+                  <div
+                    className="w-1 h-10 rounded-full shrink-0 mt-0.5"
+                    style={{ backgroundColor: getGameColor(lot.game) }}
+                  />
+                  <div className="min-w-0">
+                    <p className="text-sm font-medium truncate">{lot.card_name}</p>
+                    <p className="text-xs text-muted-foreground truncate">
+                      {getGameDisplayName(lot.game)}
+                    </p>
+                    {lot.set_name && (
+                      <p className="text-xs text-muted-foreground truncate">{lot.set_name}</p>
+                    )}
+                  </div>
+                </div>
+                {/* Right: actions */}
+                <div className="flex items-center gap-1 shrink-0">
+                  {onEdit && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7"
+                      onClick={() => onEdit(lot)}
+                      aria-label="Edit"
+                    >
+                      <Edit className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                  {onDelete && (
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="h-7 w-7 text-destructive"
+                      onClick={() => onDelete(lot)}
+                      aria-label="Delete"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </Button>
+                  )}
+                </div>
+              </div>
+
+              {/* Meta row */}
+              <div className="mt-2 flex flex-wrap items-center gap-x-3 gap-y-1 pl-3">
+                <Badge variant="outline" className="text-xs h-5">
+                  {lot.condition}
+                </Badge>
+                <span className="text-xs text-muted-foreground">
+                  Qty: <span className="text-foreground">{lot.qty_on_hand}</span>
+                  <span className="text-muted-foreground">/{lot.qty_initial}</span>
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Cost: <span className="text-foreground font-mono">{formatCurrency(lot.cost_per_card)}</span>/ea
+                </span>
+                <span className="text-xs text-muted-foreground">
+                  Total: <span className="text-foreground font-mono">{formatCurrency(lot.total_cost)}</span>
+                </span>
+                {lot.variant && (
+                  <span className="text-xs text-muted-foreground">{lot.variant}</span>
+                )}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* ── Desktop: full table (md+) ── */}
+        <div className="hidden md:block overflow-x-auto">
           <table className="w-full">
             <thead className="bg-muted/50 border-b border-border">
               <tr>
@@ -173,15 +251,18 @@ export function InventoryTable({
             </tbody>
           </table>
         </div>
+
+        {/* ── Pagination (shared) ── */}
         {totalPages > 1 && onPageChange && (
-          <div className="flex items-center justify-between px-4 py-3 border-t border-border">
-            <p className="text-sm text-muted-foreground">
+          <div className="flex items-center justify-between px-3 sm:px-4 py-2.5 sm:py-3 border-t border-border">
+            <p className="text-xs sm:text-sm text-muted-foreground">
               Page {page} of {totalPages}
             </p>
-            <div className="flex gap-2">
+            <div className="flex gap-1.5 sm:gap-2">
               <Button
                 variant="outline"
                 size="sm"
+                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
                 disabled={page <= 1}
                 onClick={() => onPageChange(page - 1)}
               >
@@ -190,6 +271,7 @@ export function InventoryTable({
               <Button
                 variant="outline"
                 size="sm"
+                className="h-7 sm:h-8 text-xs sm:text-sm px-2 sm:px-3"
                 disabled={page >= totalPages}
                 onClick={() => onPageChange(page + 1)}
               >

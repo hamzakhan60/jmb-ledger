@@ -43,24 +43,24 @@ export default function SignupPage() {
     >
       <motion.form
         onSubmit={handleSubmit}
-        className="space-y-4"
+        className="space-y-4 w-full max-w-sm mx-auto sm:max-w-md px-4 sm:px-0"
         variants={authContainerVariants}
         initial="hidden"
         animate="show"
       >
         <motion.div variants={authItemVariants}>
-          <Label htmlFor="email">Email</Label>
+          <Label htmlFor="email" className="text-sm sm:text-base">Email</Label>
           <Input
             id="email"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
             required
-            className="mt-1.5 transition-all focus:ring-2 focus:ring-primary/20"
+            className="mt-1.5 transition-all focus:ring-2 focus:ring-primary/20 h-10 sm:h-11 text-sm sm:text-base"
           />
         </motion.div>
         <motion.div variants={authItemVariants}>
-          <Label htmlFor="password">Password</Label>
+          <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
           <Input
             id="password"
             type="password"
@@ -68,14 +68,14 @@ export default function SignupPage() {
             onChange={(e) => setPassword(e.target.value)}
             required
             minLength={6}
-            className="mt-1.5 transition-all focus:ring-2 focus:ring-primary/20"
+            className="mt-1.5 transition-all focus:ring-2 focus:ring-primary/20 h-10 sm:h-11 text-sm sm:text-base"
           />
         </motion.div>
         {error && (
           <motion.p
             initial={{ opacity: 0, y: -4 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-sm text-destructive"
+            className="text-xs sm:text-sm text-destructive"
           >
             {error}
           </motion.p>
@@ -83,7 +83,7 @@ export default function SignupPage() {
         <motion.div variants={authItemVariants}>
           <Button
             type="submit"
-            className="w-full font-medium"
+            className="w-full font-medium h-10 sm:h-11 text-sm sm:text-base"
             disabled={loading}
           >
             {loading ? "Creating account…" : "Sign up"}
@@ -92,7 +92,7 @@ export default function SignupPage() {
       </motion.form>
       <motion.p
         variants={authItemVariants}
-        className="mt-6 text-center text-sm text-muted-foreground"
+        className="mt-6 text-center text-xs sm:text-sm text-muted-foreground px-4 sm:px-0"
       >
         Already have an account?{" "}
         <Link

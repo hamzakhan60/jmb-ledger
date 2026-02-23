@@ -68,113 +68,122 @@ export function EditLotDrawer({ lot, open, onOpenChange }: EditLotDrawerProps) {
 
   return (
     <Drawer open={open} onOpenChange={onOpenChange} direction="right">
-      <DrawerContent className="max-w-[480px] w-full ml-auto" key={key}>
-        <DrawerHeader>
-          <DrawerTitle>Edit lot</DrawerTitle>
+      <DrawerContent className="w-full sm:max-w-[480px] ml-auto flex flex-col h-full" key={key}>
+        <DrawerHeader className="px-4 pt-4 pb-2 sm:px-6 sm:pt-5 shrink-0">
+          <DrawerTitle className="text-base sm:text-lg">Edit lot</DrawerTitle>
         </DrawerHeader>
+
         <form
           onSubmit={form.handleSubmit(onSubmit)}
-          className="flex flex-col gap-4 px-4 pb-4"
+          className="flex flex-col flex-1 min-h-0"
         >
           <Form {...form}>
-            <FormField
-              control={form.control}
-              name="card_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Card name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="set_name"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Set name</FormLabel>
-                  <FormControl>
-                    <Input {...field} />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="condition"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Condition</FormLabel>
-                  <Select
-                    onValueChange={field.onChange}
-                    value={field.value}
-                  >
+            {/* Scrollable fields area */}
+            <div className="flex-1 overflow-y-auto px-4 sm:px-6 py-2 space-y-3 sm:space-y-4">
+              <FormField
+                control={form.control}
+                name="card_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs sm:text-sm">Card name</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue />
-                      </SelectTrigger>
+                      <Input {...field} className="h-8 sm:h-9 text-xs sm:text-sm" />
                     </FormControl>
-                    <SelectContent>
-                      {CONDITIONS.map((c) => (
-                        <SelectItem key={c} value={c}>
-                          {c}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="qty_initial"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Quantity</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={1}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseInt(e.target.value, 10) || 0)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="total_cost"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Total cost ($)</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      min={0}
-                      step={0.01}
-                      {...field}
-                      onChange={(e) =>
-                        field.onChange(parseFloat(e.target.value) || 0)
-                      }
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="set_name"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs sm:text-sm">Set name</FormLabel>
+                    <FormControl>
+                      <Input {...field} className="h-8 sm:h-9 text-xs sm:text-sm" />
+                    </FormControl>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="condition"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel className="text-xs sm:text-sm">Condition</FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger className="h-8 sm:h-9 text-xs sm:text-sm">
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {CONDITIONS.map((c) => (
+                          <SelectItem key={c} value={c} className="text-xs sm:text-sm">
+                            {c}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormMessage className="text-xs" />
+                  </FormItem>
+                )}
+              />
+
+              {/* Qty + Total cost side by side */}
+              <div className="grid grid-cols-2 gap-3 sm:gap-4">
+                <FormField
+                  control={form.control}
+                  name="qty_initial"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs sm:text-sm">Quantity</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={1}
+                          {...field}
+                          onChange={(e) => field.onChange(parseInt(e.target.value, 10) || 0)}
+                          className="h-8 sm:h-9 text-xs sm:text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+                <FormField
+                  control={form.control}
+                  name="total_cost"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel className="text-xs sm:text-sm">Total cost ($)</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          min={0}
+                          step={0.01}
+                          {...field}
+                          onChange={(e) => field.onChange(parseFloat(e.target.value) || 0)}
+                          className="h-8 sm:h-9 text-xs sm:text-sm"
+                        />
+                      </FormControl>
+                      <FormMessage className="text-xs" />
+                    </FormItem>
+                  )}
+                />
+              </div>
+            </div>
           </Form>
-          <DrawerFooter>
-            <Button type="submit" disabled={editLot.isPending}>
-              Save changes
+
+          {/* Sticky footer */}
+          <DrawerFooter className="px-4 sm:px-6 py-3 sm:py-4 border-t border-border shrink-0">
+            <Button
+              type="submit"
+              disabled={editLot.isPending}
+              className="w-full h-8 sm:h-9 text-xs sm:text-sm"
+            >
+              {editLot.isPending ? "Saving..." : "Save changes"}
             </Button>
           </DrawerFooter>
         </form>
