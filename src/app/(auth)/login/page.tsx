@@ -8,12 +8,14 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { createSupabaseBrowserClient } from '@/lib/supabase/client';
 import { motion } from 'motion/react';
+import { Eye, EyeOff } from 'lucide-react';
 import { AuthPageShell, authContainerVariants, authItemVariants } from '@/components/auth/AuthPageShell';
 
 export default function LoginPage() {
   const router = useRouter();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -60,14 +62,28 @@ export default function LoginPage() {
         </motion.div>
         <motion.div variants={authItemVariants}>
           <Label htmlFor="password" className="text-sm sm:text-base">Password</Label>
-          <Input
-            id="password"
-            type="password"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            required
-            className="mt-1.5 transition-all focus:ring-2 focus:ring-primary/20 h-10 sm:h-11 text-sm sm:text-base"
-          />
+          <div className="relative mt-1.5">
+            <Input
+              id="password"
+              type={showPassword ? 'text' : 'password'}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="pr-10 transition-all focus:ring-2 focus:ring-primary/20 h-10 sm:h-11 text-sm sm:text-base"
+            />
+            <button
+              type="button"
+              onClick={() => setShowPassword((prev) => !prev)}
+              className="absolute right-2 top-1/2 -translate-y-1/2 p-1 rounded-md text-muted-foreground hover:text-foreground focus:outline-none focus:ring-2 focus:ring-primary/20 focus:ring-offset-0"
+              aria-label={showPassword ? 'Hide password' : 'Show password'}
+            >
+              {showPassword ? (
+                <EyeOff className="size-5" />
+              ) : (
+                <Eye className="size-5" />
+              )}
+            </button>
+          </div>
         </motion.div>
         {error && (
           <motion.p
