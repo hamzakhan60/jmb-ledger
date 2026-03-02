@@ -18,28 +18,82 @@ import { motion } from "motion/react";
 import { createSupabaseBrowserClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Skeleton } from "@/components/ui/skeleton";
-
-const avatarColors = [
-  "#00E5FF",
-  "#6D28D9",
-  "#D4AF37",
-  "#10b981",
-  "#f59e0b",
-  "#ef4444",
-];
+import { toast } from "sonner";
 
 export default function ProfilePage() {
   const router = useRouter();
   const { data: profile, isLoading } = useProfile();
-  const [selectedColor, setSelectedColor] = useState(avatarColors[0]);
   const [changePasswordOpen, setChangePasswordOpen] = useState(false);
   const [logoutConfirm, setLogoutConfirm] = useState(false);
+  const [currentPassword, setCurrentPassword] = useState("");
+  const [newPassword, setNewPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
+  const [changePasswordLoading, setChangePasswordLoading] = useState(false);
+  const [changePasswordError, setChangePasswordError] = useState<string | null>(null);
 
   async function handleSignOut() {
     const supabase = createSupabaseBrowserClient();
     await supabase.auth.signOut();
     router.push("/login");
     router.refresh();
+  }
+
+  async function handleChangePassword(e: React.FormEvent) {
+    e.preventDefault();
+    setChangePasswordError(null);
+    if (newPassword !== confirmPassword) {
+      setChangePasswordError("New passwords do not match.");
+      return;
+    }
+    if (newPassword.length < 6) {
+      setChangePasswordError("New password must be at least 6 characters.");
+      return;
+    }
+    const email = profile?.email;
+    if (!email) {
+      setChangePasswordError("Email not found.");
+      return;
+    }
+    setChangePasswordLoading(true);
+    const supabase = createSupabaseBrowserClient();
+    try {
+      const { error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password: currentPassword,
+      });
+      if (signInError) {
+        setChangePasswordError("Current password is incorrect.");
+        setChangePasswordLoading(false);
+        return;
+      }
+      const { error: updateError } = await supabase.auth.updateUser({
+        password: newPassword,
+      });
+      if (updateError) {
+        setChangePasswordError(updateError.message);
+        setChangePasswordLoading(false);
+        return;
+      }
+      toast.success("Password updated successfully.");
+      setChangePasswordOpen(false);
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+    } catch (err) {
+      setChangePasswordError(err instanceof Error ? err.message : "Something went wrong.");
+    } finally {
+      setChangePasswordLoading(false);
+    }
+  }
+
+  function closeChangePasswordDialog(open: boolean) {
+    if (!open) {
+      setCurrentPassword("");
+      setNewPassword("");
+      setConfirmPassword("");
+      setChangePasswordError(null);
+    }
+    setChangePasswordOpen(open);
   }
 
   if (isLoading) {
@@ -86,11 +140,7 @@ export default function ProfilePage() {
           <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4 sm:gap-6">
             <div className="flex flex-col items-center gap-2 sm:gap-3 shrink-0">
               <div
-                className="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center"
-                style={{
-                  backgroundColor: `${selectedColor}20`,
-                  color: selectedColor,
-                }}
+                className="w-16 h-16 sm:w-24 sm:h-24 rounded-full flex items-center justify-center bg-primary/20 text-primary"
               >
                 <User className="w-8 h-8 sm:w-12 sm:h-12" />
               </div>
@@ -120,22 +170,6 @@ export default function ProfilePage() {
             </div>
           </div>
 
-          <div className="mt-4 sm:mt-6 pt-4 sm:pt-6 border-t border-border">
-            <Label className="mb-2 sm:mb-3 block text-xs sm:text-sm">Avatar Color</Label>
-            <div className="flex flex-wrap gap-2 sm:gap-2">
-              {avatarColors.map((color) => (
-                <button
-                  key={color}
-                  type="button"
-                  onClick={() => setSelectedColor(color)}
-                  className={`w-8 h-8 sm:w-10 sm:h-10 rounded-full transition-all ${
-                    selectedColor === color ? "ring-2 ring-offset-2 ring-primary" : ""
-                  }`}
-                  style={{ backgroundColor: color }}
-                />
-              ))}
-            </div>
-          </div>
         </Card>
       </motion.div>
 
@@ -178,21 +212,80 @@ export default function ProfilePage() {
       </motion.div>
 
       {/* ── Change Password dialog ── */}
-      <Dialog open={changePasswordOpen} onOpenChange={setChangePasswordOpen}>
+      <Dialog open={changePasswordOpen} onOpenChange={closeChangePasswordDialog}>
         <DialogContent className="w-[calc(100vw-2rem)] sm:max-w-md p-4 sm:p-6">
           <DialogHeader>
             <DialogTitle className="text-base sm:text-lg">Change Password</DialogTitle>
           </DialogHeader>
-          <p className="text-xs sm:text-sm text-muted-foreground">
-            Use the email link from Supabase to reset your password, or sign out and use &quot;Forgot password&quot; on the login page.
-          </p>
-          <Button
-            variant="outline"
-            className="h-8 sm:h-9 text-xs sm:text-sm"
-            onClick={() => setChangePasswordOpen(false)}
-          >
-            Close
-          </Button>
+          <form onSubmit={handleChangePassword} className="space-y-3 sm:space-y-4">
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="current-password" className="text-xs sm:text-sm">
+                Current password
+              </Label>
+              <Input
+                id="current-password"
+                type="password"
+                autoComplete="current-password"
+                value={currentPassword}
+                onChange={(e) => setCurrentPassword(e.target.value)}
+                required
+                className="h-8 sm:h-9 text-xs sm:text-sm"
+                placeholder="Enter current password"
+              />
+            </div>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="new-password" className="text-xs sm:text-sm">
+                New password
+              </Label>
+              <Input
+                id="new-password"
+                type="password"
+                autoComplete="new-password"
+                value={newPassword}
+                onChange={(e) => setNewPassword(e.target.value)}
+                required
+                minLength={6}
+                className="h-8 sm:h-9 text-xs sm:text-sm"
+                placeholder="At least 6 characters"
+              />
+            </div>
+            <div className="space-y-1.5 sm:space-y-2">
+              <Label htmlFor="confirm-password" className="text-xs sm:text-sm">
+                Confirm new password
+              </Label>
+              <Input
+                id="confirm-password"
+                type="password"
+                autoComplete="new-password"
+                value={confirmPassword}
+                onChange={(e) => setConfirmPassword(e.target.value)}
+                required
+                minLength={6}
+                className="h-8 sm:h-9 text-xs sm:text-sm"
+                placeholder="Confirm new password"
+              />
+            </div>
+            {changePasswordError && (
+              <p className="text-xs text-destructive">{changePasswordError}</p>
+            )}
+            <div className="flex gap-2 sm:gap-3 pt-1">
+              <Button
+                type="button"
+                variant="ghost"
+                className="h-8 sm:h-9 text-xs sm:text-sm"
+                onClick={() => closeChangePasswordDialog(false)}
+              >
+                Cancel
+              </Button>
+              <Button
+                type="submit"
+                disabled={changePasswordLoading}
+                className="h-8 sm:h-9 text-xs sm:text-sm"
+              >
+                {changePasswordLoading ? "Updating…" : "Update password"}
+              </Button>
+            </div>
+          </form>
         </DialogContent>
       </Dialog>
 
